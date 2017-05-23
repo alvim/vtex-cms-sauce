@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/alvimm/vtex-cms-sauce/issues"
   },
-  "homepage": "https://github.com/alvimm/vtex-cms-sauce#readme"
+  "homepage": "https://github.com/alvimm/vtex-cms-sauce#readme",
+  "dependencies": {
+    "apisauce": "^0.13.0"
+  }
 }
