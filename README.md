@@ -4,6 +4,7 @@ VTEX package for handling CMS requests.
 --------------------------------------
 *This package is not official and may be deprecated as a result of any future changes to the VTEX portal. Before that, use it freely and wisely.*
 
+## :warning: Warning! :warning:
 
 ### Getting started
 To use it, first install with: `npm install vtex-cms-sauce`.
