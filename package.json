@@ -1,5 +1,5 @@
 {
-  "name": "@gtxagency/vtex-cms-sauce",
+  "name": "vtex-cms-sauce",
   "version": "0.1.0",
   "description": "VTEX plugin for handling cms requests.",
   "main": "index.js",
