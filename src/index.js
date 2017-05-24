@@ -1,6 +1,7 @@
 import "babel-core/register"
 import "babel-polyfill"
 
+import { createHash } from 'crypto'
 import apisauce from 'apisauce'
 
 const VTEXID_EMAIL = 'malvimmacedo@gmail.com'
@@ -44,6 +45,8 @@ const create = (baseURL) => {
     } catch(err) { console.error(err) }
   }
 
+  const _getTemplateId = (templatename) => createHash('md5').update(templatename).digest('hex')
+
   const _saveTemplate = (authCookie, data = {}) => {
     try {
       const { templatename, template, templateId } = data
@@ -67,19 +70,30 @@ const create = (baseURL) => {
   }
 
   const saveTemplate = async (templatename, HTML) => {
-    const authCookie = await _getAuthCookie()
-    const data = {
-      templatename,
-      template: HTML
-    }
+    try {
+      const authCookie = await _getAuthCookie()
+      const reqData = {
+        templatename,
+        templateId: _getTemplateId(templatename),
+        template: HTML
+      }
+      const { status, data } = await _saveTemplate(authCookie, reqData)
+      
+      if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${templatename}). Status: ${status}`)
+      if (~data.indexOf('originalMessage')) {
+        const x = data.indexOf('<applicationexceptionobject>') + 28
+        const y = data.indexOf('</applicationexceptionobject>')
+        const obj = JSON.parse(data.substr(x, y - x))
+        throw new Error(`Couldn't save template (${templatename}): ${obj.message}`)
+      }
 
-    return _saveTemplate(authCookie, data)
+      return `Template (${templatename}) saved!`
+    } catch(err) { console.error(err) }
   }
 
   // The public API
   return {
-    saveTemplate,
-    _getAuthCookie
+    saveTemplate
   }
 }
 
