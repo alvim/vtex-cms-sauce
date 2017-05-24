@@ -8,14 +8,33 @@ VTEX package for handling CMS requests
 *VTEX-CMS-Sauce was created to allow a better deploying experience for VTEX shops. Therefore, it's recommended to use it in a brand new environment, to minimize the risk of overwriting existing templates. The chances are almost null, but I thought I should warn you.*
 
 ### Getting started
-To use it, first install with: `npm install vtex-cms-sauce`.
+To use it, first install with:
+
+1. `npm install vtex-cms-sauce`.
+
+2. Create a `.vtexid` config file in project root with the following content:
+```
+{
+  "login": "your-email@something.com",
+  "password": "your-password"
+}
+```
+*NOTE: You must have access to the store you're trying to work on.*
+
+3. Create your api-sauced cms handler:
+```
+import { create } from 'vtex-cms-sauce'
+const cms = create('https://STORE_NAME.vtexcommercestable.com.br')
+...
+```
 
 ### Methods
 
 #### Save Template
-`cms.saveTemplate(templateName, HTML)`
+`cms.saveTemplate(templateName, HTML, isSub = false)`
 * templateName **{String}** - *From this string, the templateId will be created in background.*
 * HTML **{String}** - *String containing the HTML template.*
+* isSub **{Boolean}** - *Pass true if subtemplate*
 
 ###### Example
 ```

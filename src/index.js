@@ -46,14 +46,13 @@ const create = (baseURL) => {
 
   const _getTemplateId = (templatename) => createHash('md5').update(templatename).digest('hex')
 
-  const _saveTemplate = (authCookie, data = {}) => {
+  const _saveTemplate = (authCookie, data = {}, isSub) => {
     try {
       const { templatename, template, templateId } = data
 
       if (!authCookie) throw new Error('You must provide a valid auth cookie!')
       if (!templatename) throw new Error('You must provide a name when saving a template!')
       if (!template) throw new Error('You must provide content when saving a template!')
-      if (!templateId) throw new Error('You must provide a Template id when saving a template!')
 
       api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
 
@@ -61,14 +60,14 @@ const create = (baseURL) => {
         templatename,
         template,
         templateId,
-        isSub: 'False',
+        isSub,
         actionForm: 'Save',
         textConfirm: 'sim'
       })
     } catch(err) { console.error(err) }
   }
 
-  const saveTemplate = async (templatename, HTML) => {
+  const saveTemplate = async (templatename, HTML, isSub = false) => {
     try {
       const authCookie = await _getAuthCookie()
       const reqData = {
@@ -76,7 +75,7 @@ const create = (baseURL) => {
         templateId: _getTemplateId(templatename),
         template: HTML
       }
-      const { status, data } = await _saveTemplate(authCookie, reqData)
+      const { status, data } = await _saveTemplate(authCookie, reqData, isSub)
 
       if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${templatename}). Status: ${status}`)
       if (~data.indexOf('originalMessage')) {
