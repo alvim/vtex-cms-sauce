@@ -12,6 +12,7 @@ const create = (baseURL) => {
     timeout: 10000
   })
 
+  // Transforms JSON request data into x-www-form-urlencoded
   api.addRequestTransform(request => {
     let str = []
     for (const p in request.data) {
@@ -20,9 +21,14 @@ const create = (baseURL) => {
     request.data = str.join('&')
   })
 
-  // Define some functions that call the api.  The goal is to provide
-  // a thin wrapper of the api layer providing nicer feeling functions
-  // rather than "get", "post" and friends.
+  /**
+   * @apiName saveTemplate
+   * @apiGroup User
+   * @apiPermission admin
+   * @apiParam {String} access_token User access_token.
+   * @apiUse listParams
+   * @apiSuccess {Object} users List of users.
+   */
   const saveTemplate = (authCookie, data = {}) => {
     try {
       const { templatename, template, templateId } = data
@@ -45,32 +51,12 @@ const create = (baseURL) => {
     } catch(err) { console.error(err) }
   }
 
-  // const createUser = (email, password) => api.post('users', {email, password})
-  // const getMe = (accessToken) => api.post(`users/me?${accessToken}`)
-  // const getUser = (userId, accessToken) => api.post(`users/${userId}?${accessToken}`)
-
-  // ------
-  // STEP 3
-  // ------
-  //
-  // Return back a collection of functions that we would consider our
-  // interface.  Most of the time it'll be just the list of all the
-  // methods in step 2.
-  //
-  // Notice we're not returning back the `api` created in step 1?  That's
-  // because it is scoped privately.  This is one way to create truly
-  // private scoped goodies in JavaScript.
-  //
+  // The public API
   return {
-    // a list of the API functions from step 2
     saveTemplate
-    // createUser
-    // getMe,
-    // getUser
   }
 }
 
-// let's return back our create method as the default.
 module.exports = {
   create
 }
