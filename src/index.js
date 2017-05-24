@@ -1,4 +1,10 @@
+import "babel-core/register"
+import "babel-polyfill"
+
 import apisauce from 'apisauce'
+
+const VTEXID_EMAIL = 'malvimmacedo@gmail.com'
+const VTEXID_PASSWORD = 'Wololo1408'
 
 const create = (baseURL) => {
   // Create and configure an apisauce-based api object.
@@ -21,15 +27,24 @@ const create = (baseURL) => {
     request.data = str.join('&')
   })
 
-  /**
-   * @apiName saveTemplate
-   * @apiGroup User
-   * @apiPermission admin
-   * @apiParam {String} access_token User access_token.
-   * @apiUse listParams
-   * @apiSuccess {Object} users List of users.
-   */
-  const saveTemplate = (authCookie, data = {}) => {
+  const _getAuthCookie = async () => {
+    try {
+      const { data: { authenticationToken } } = await api.get('api/vtexid/pub/authentication/start')
+      if (!authenticationToken) throw new Error('Can\'t get an authentication token.')
+
+      const params = {
+        authenticationToken,
+        login: VTEXID_EMAIL,
+        password: VTEXID_PASSWORD
+      }
+      const { data: { authCookie: { Value } } } = await api.get('api/vtexid/pub/authentication/classic/validate', params)
+      if (!Value) throw new Error('Can\'t get an authentication cookie.')
+
+      return Value
+    } catch(err) { console.error(err) }
+  }
+
+  const _saveTemplate = (authCookie, data = {}) => {
     try {
       const { templatename, template, templateId } = data
 
@@ -51,9 +66,20 @@ const create = (baseURL) => {
     } catch(err) { console.error(err) }
   }
 
+  const saveTemplate = async (templatename, HTML) => {
+    const authCookie = await _getAuthCookie()
+    const data = {
+      templatename,
+      template: HTML
+    }
+
+    return _saveTemplate(authCookie, data)
+  }
+
   // The public API
   return {
-    saveTemplate
+    saveTemplate,
+    _getAuthCookie
   }
 }
 
