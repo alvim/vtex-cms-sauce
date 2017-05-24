@@ -51,3 +51,22 @@ cms
   .then(console.log)
   .catch(console.error)
 ```
+
+#### Save Shelf Template
+`cms.saveShelfTemplate(templateName, HTML, shelfClass)`
+* templateName **{String}** - *From this string, the templateId will be created in background.*
+* HTML **{String}** - *String containing the HTML template.*
+* shelfClass **{String}** - *Classname of shelf container*
+
+###### Example
+```
+const HTML = `
+<div class="product">
+  Product
+</div>
+`
+cms
+  .saveShelfTemplate('MainShelf', HTML, 'main-shelf')
+  .then(console.log)
+  .catch(console.error)
+```
