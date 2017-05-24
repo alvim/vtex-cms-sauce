@@ -1,11 +1,11 @@
-import "babel-core/register"
-import "babel-polyfill"
+import { readFileSync } from 'fs'
+import 'babel-core/register'
+import 'babel-polyfill'
 
 import { createHash } from 'crypto'
 import apisauce from 'apisauce'
 
-const VTEXID_EMAIL = 'malvimmacedo@gmail.com'
-const VTEXID_PASSWORD = 'Wololo1408'
+const VTEXID = JSON.parse(readFileSync('.vtexid', 'utf8'))
 
 const create = (baseURL) => {
   // Create and configure an apisauce-based api object.
@@ -23,7 +23,7 @@ const create = (baseURL) => {
   api.addRequestTransform(request => {
     let str = []
     for (const p in request.data) {
-      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(request.data[p]));
+      str.push(encodeURIComponent(p) + '=' + encodeURIComponent(request.data[p]));
     }
     request.data = str.join('&')
   })
@@ -35,8 +35,7 @@ const create = (baseURL) => {
 
       const params = {
         authenticationToken,
-        login: VTEXID_EMAIL,
-        password: VTEXID_PASSWORD
+        ...VTEXID
       }
       const { data: { authCookie: { Value } } } = await api.get('api/vtexid/pub/authentication/classic/validate', params)
       if (!Value) throw new Error('Can\'t get an authentication cookie.')
@@ -78,7 +77,7 @@ const create = (baseURL) => {
         template: HTML
       }
       const { status, data } = await _saveTemplate(authCookie, reqData)
-      
+
       if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${templatename}). Status: ${status}`)
       if (~data.indexOf('originalMessage')) {
         const x = data.indexOf('<applicationexceptionobject>') + 28
