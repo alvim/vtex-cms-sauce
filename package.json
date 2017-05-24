@@ -1,11 +1,10 @@
 {
   "name": "vtex-cms-sauce",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "VTEX plugin for handling cms requests.",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel src -d lib",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel src -d lib"
   },
   "repository": {
     "type": "git",
