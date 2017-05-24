@@ -5,16 +5,25 @@ const create = (baseURL) => {
   const api = apisauce.create({
     baseURL,
     headers: {
-      'Cache-Control': 'no-cache'
-      'Accept': '*/*'
+      'Cache-Control': 'no-cache',
+      'Accept': '*/*',
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     },
     timeout: 10000
+  })
+
+  api.addRequestTransform(request => {
+    let str = []
+    for (const p in request.data) {
+      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(request.data[p]));
+    }
+    request.data = str.join('&')
   })
 
   // Define some functions that call the api.  The goal is to provide
   // a thin wrapper of the api layer providing nicer feeling functions
   // rather than "get", "post" and friends.
-  const saveTemplate = (authCookie, data) => {
+  const saveTemplate = (authCookie, data = {}) => {
     try {
       const { templatename, template, templateId } = data
 
@@ -23,7 +32,7 @@ const create = (baseURL) => {
       if (!template) throw new Error('You must provide content when saving a template!')
       if (!templateId) throw new Error('You must provide a Template id when saving a template!')
 
-      api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie}`)
+      api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
 
       return api.post('admin/a/PortalManagement/SaveTemplate', {
         templatename,
@@ -54,7 +63,7 @@ const create = (baseURL) => {
   //
   return {
     // a list of the API functions from step 2
-    login
+    saveTemplate
     // createUser
     // getMe,
     // getUser
@@ -62,6 +71,6 @@ const create = (baseURL) => {
 }
 
 // let's return back our create method as the default.
-export default {
+module.exports = {
   create
 }

@@ -2,8 +2,9 @@
   "name": "vtex-cms-sauce",
   "version": "0.1.0",
   "description": "VTEX plugin for handling cms requests.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
+    "build": "babel src -d lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,5 +25,9 @@
   "homepage": "https://github.com/alvimm/vtex-cms-sauce#readme",
   "dependencies": {
     "apisauce": "^0.13.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.5.1"
   }
 }
