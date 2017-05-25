@@ -30,6 +30,7 @@
     "babel-core": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-polyfill": "^6.23.0",
-    "babel-preset-env": "^1.5.1"
+    "babel-preset-env": "^1.5.1",
+    "form-data": "^2.1.4"
   }
 }

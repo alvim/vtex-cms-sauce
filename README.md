@@ -8,8 +8,6 @@ VTEX package for handling CMS requests
 *VTEX-CMS-Sauce was created to allow a better deploying experience for VTEX shops. Therefore, it's recommended to use it in a brand new environment, to minimize the risk of overwriting existing templates. The chances are almost null, but I thought I should warn you.*
 
 ### Getting started
-To use it, first install with:
-
 1. `npm install vtex-cms-sauce`.
 
 2. Create a `.vtexid` config file in project root with the following content:

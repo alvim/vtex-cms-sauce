@@ -1,8 +1,9 @@
-import { readFileSync } from 'fs'
 import 'babel-core/register'
 import 'babel-polyfill'
-
+import { readFileSync, createReadStream } from 'fs'
 import { createHash } from 'crypto'
+import FormData from 'form-data'
+
 import apisauce from 'apisauce'
 
 const VTEXID = JSON.parse(readFileSync('.vtexid', 'utf8'))
@@ -33,6 +34,7 @@ const create = (baseURL) => {
       const { data: { authenticationToken } } = await api.get('api/vtexid/pub/authentication/start')
       if (!authenticationToken) throw new Error('Can\'t get an authentication token.')
 
+      api.setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
       const params = {
         authenticationToken,
         ...VTEXID
@@ -57,6 +59,7 @@ const create = (baseURL) => {
       if (!template) throw new Error('You must provide content when saving a template!')
 
       api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
+      api.setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
 
       return api.post(endpoint, {
         ...data,
@@ -117,6 +120,26 @@ const create = (baseURL) => {
       return `Template (${templatename}) saved!`
     } catch(err) { console.error(err) }
   }
+
+  // const fileUpload = async () => {
+  //   try {
+  //     const authCookie = await _getAuthCookie()
+  //
+  //     api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
+  //
+  //     const form = new FormData()
+  //     form.append('Filename', 'atitude.jpg')
+  //     form.append('fileext', '*.jpg;*.png;*.gif;*.jpeg;*.ico')
+  //     form.append('folder', '/uploads')
+  //     form.append('Upload', 'Submit Query')
+  //     form.append('requestToken', 'F3PBE3AU0H0OTXZ4AR2HB24F0X1E0T1V0D1I0R1E0K1C0I1P0E1L0I1F636312550903598717')
+  //     form.append('Filedata', createReadStream('atitude.jpg'))
+  //
+  //     api.setHeader('Content-Type', form.getHeaders()['content-type'])
+  //
+  //     return api.post('admin/a/FilePicker/UploadFile', form)
+  //   } catch(err) { console.error(err) }
+  // }
 
   // The public API
   return {
