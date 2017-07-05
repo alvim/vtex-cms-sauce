@@ -47,6 +47,7 @@ const create = (baseURL) => {
   }
 
   const _getTemplateId = (templatename) => createHash('md5').update(templatename).digest('hex')
+  const _getRequestToken = () => 'YCTWVII010W25YR21ELDZEFK0X1E0T1V0D1I0R1E0K1C0I1P0E1L0I1F636348762400712903'
 
   const _saveTemplate = async (data = {}, isSub, type, actionForm = 'Save') => {
     try {
@@ -121,30 +122,47 @@ const create = (baseURL) => {
     } catch(err) { console.error(err) }
   }
 
-  // const fileUpload = async () => {
-  //   try {
-  //     const authCookie = await _getAuthCookie()
-  //
-  //     api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
-  //
-  //     const form = new FormData()
-  //     form.append('Filename', 'atitude.jpg')
-  //     form.append('fileext', '*.jpg;*.png;*.gif;*.jpeg;*.ico')
-  //     form.append('folder', '/uploads')
-  //     form.append('Upload', 'Submit Query')
-  //     form.append('requestToken', 'F3PBE3AU0H0OTXZ4AR2HB24F0X1E0T1V0D1I0R1E0K1C0I1P0E1L0I1F636312550903598717')
-  //     form.append('Filedata', createReadStream('atitude.jpg'))
-  //
-  //     api.setHeader('Content-Type', form.getHeaders()['content-type'])
-  //
-  //     return api.post('admin/a/FilePicker/UploadFile', form)
-  //   } catch(err) { console.error(err) }
-  // }
+  const fileUpload = async (filepath) => {
+    try {
+      const authCookie = await _getAuthCookie()
+
+      api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
+
+      const form = new FormData()
+      form.append('Filename', filepath)
+      form.append('fileext', '*.jpg;*.png;*.gif;*.jpeg;*.ico;*.js;*.css')
+      form.append('folder', '/uploads')
+      form.append('Upload', 'Submit Query')
+
+      // ESTUDAR MELHOR ESTE TOKEN, COMO CONSEGUI-LO
+      form.append('requestToken', _getRequestToken())
+      form.append('Filedata', createReadStream(filepath))
+
+      api.setHeader('Content-Type', form.getHeaders()['content-type'])
+
+      const { statusCode } = await new Promise((resolve, reject) => {
+        form.submit({
+          host: 'gtx.vtexcommercestable.com.br',
+          path: '/admin/a/FilePicker/UploadFile',
+          headers: {
+            Cookie: `VtexIdclientAutCookie=${authCookie};`
+          }
+        }, (err, res) => {
+          if (err) reject(err)
+          resolve(res)
+        })
+      })
+      if (statusCode.toString().substr(0, 1) !== '2') throw new Error(`Couldn\'t save file: ${filepath} (Error: ${statusCode})`)
+
+      return `File: ${filepath} saved!`
+    } catch(err) { console.error(err) }
+  }
 
   // The public API
   return {
     saveTemplate,
-    saveShelfTemplate
+    saveShelfTemplate,
+    fileUpload
   }
 }
 
