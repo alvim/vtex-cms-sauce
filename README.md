@@ -80,3 +80,6 @@ cms
   .then(console.log)
   .catch(console.error)
 ```
+
+## License
+MIT © [Mauricio Alvim](https://github.com/alvimm)
