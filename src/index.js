@@ -3,6 +3,7 @@ import 'babel-polyfill'
 import { readFileSync, createReadStream } from 'fs'
 import { createHash } from 'crypto'
 import FormData from 'form-data'
+import cheerio from 'cheerio'
 
 import apisauce from 'apisauce'
 
@@ -47,7 +48,20 @@ const create = (baseURL) => {
   }
 
   const _getTemplateId = (templatename) => createHash('md5').update(templatename).digest('hex')
-  const _getRequestToken = () => 'YCTWVII010W25YR21ELDZEFK0X1E0T1V0D1I0R1E0K1C0I1P0E1L0I1F636348762400712903'
+
+  const _getRequestToken = async () => {
+    try {
+      const authCookie = await _getAuthCookie()
+      api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
+
+      const { data } = await api.post('/admin/a/PortalManagement/AddFile?fileType=css')
+      const $ = cheerio.load(data)
+      const requestToken = $('#fileUploadRequestToken').val()
+      if (!requestToken) throw new Error('Couldn\'t get request token!')
+
+      return requestToken
+    } catch(err) { console.error(`Couldn't get request token: ${err}`) }
+  }
 
   const _saveTemplate = async (data = {}, isSub, type, actionForm = 'Save') => {
     try {
@@ -122,36 +136,34 @@ const create = (baseURL) => {
     } catch(err) { console.error(err) }
   }
 
-  const fileUpload = async (filepath) => {
+  const saveFile = async (filepath) => {
     try {
       const authCookie = await _getAuthCookie()
-
-      api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
+      const requestToken = await _getRequestToken()
+      const host = baseURL.replace(/(http:|https:|\/)/g, '')
 
       const form = new FormData()
       form.append('Filename', filepath)
       form.append('fileext', '*.jpg;*.png;*.gif;*.jpeg;*.ico;*.js;*.css')
       form.append('folder', '/uploads')
       form.append('Upload', 'Submit Query')
-
-      // ESTUDAR MELHOR ESTE TOKEN, COMO CONSEGUI-LO
-      form.append('requestToken', _getRequestToken())
+      form.append('requestToken', requestToken)
       form.append('Filedata', createReadStream(filepath))
-
-      api.setHeader('Content-Type', form.getHeaders()['content-type'])
 
       const { statusCode } = await new Promise((resolve, reject) => {
         form.submit({
-          host: 'gtx.vtexcommercestable.com.br',
-          path: '/admin/a/FilePicker/UploadFile',
-          headers: {
-            Cookie: `VtexIdclientAutCookie=${authCookie};`
+          host,
+          'path': '/admin/a/FilePicker/UploadFile',
+          'headers': {
+            'Cookie': `VtexIdclientAutCookie=${authCookie};`,
+            'Content-Type': form.getHeaders()['content-type']
           }
         }, (err, res) => {
           if (err) reject(err)
           resolve(res)
         })
       })
+
       if (statusCode.toString().substr(0, 1) !== '2') throw new Error(`Couldn\'t save file: ${filepath} (Error: ${statusCode})`)
 
       return `File: ${filepath} saved!`
@@ -162,7 +174,7 @@ const create = (baseURL) => {
   return {
     saveTemplate,
     saveShelfTemplate,
-    fileUpload
+    saveFile,
   }
 }
 

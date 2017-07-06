@@ -69,5 +69,14 @@ cms
   .catch(console.error)
 ```
 
-#### Save file
-**To do** :pencil2:
+#### Save File
+`cms.saveFile(filepath)`
+* filepath **{String}** - *Path of file to be uploaded*
+
+###### Example
+```
+cms
+  .saveFile('/dist/background.png')
+  .then(console.log)
+  .catch(console.error)
+```
