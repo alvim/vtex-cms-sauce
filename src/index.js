@@ -102,21 +102,23 @@ const create = (baseURL) => {
         templateCssClass: shelfClass
       }
       let { status, data } = await _saveTemplate(reqData, true, 'shelf')
+      let term = 'saved'
 
       if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${templateName}). Status: ${status}`)
       if (~data.indexOf('originalMessage')) {
         const errorMsg = _parseErrorMessage(data, templateName)
 
-        if (~errorMsg.indexOf('Já existe um template chamado')) {
+        if (~errorMsg.indexOf('Já existe um template chamado') || ~errorMsg.indexOf('Template already exists')) {
           let { status, data } = await _saveTemplate(reqData, true, 'shelf', 'Update')
 
           if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${templateName}). Status: ${status}`)
           else if (~data.indexOf('originalMessage')) throw new Error(_parseErrorMessage(data, templateName))
 
+          term = 'updated'
         } else throw new Error(errorMsg)
       }
 
-      return `Shelf template (${templateName}) saved!`
+      return `Shelf template (${templateName}) ${term}!`
     } catch(err) { console.error(err) }
   }
 
