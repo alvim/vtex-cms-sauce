@@ -17,7 +17,7 @@ VTEX package for handling CMS requests
   "password": "your-password"
 }
 ```
-*NOTE: You must have access to the store you're trying to work on.*
+*NOTE: You must have access to the store you're trying to work on. Also, you should use your VTEX login and password, not Google/Facebook.*
 
 3. Create your api-sauced cms handler:
 ```
