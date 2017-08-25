@@ -81,5 +81,52 @@ cms
   .catch(console.error)
 ```
 
+### Publish script example
+```
+const path = require('path'),
+    fs = require('fs'),
+    create = require('vtex-cms-sauce').create,
+    pjson = require('../package.json')
+
+const cms = create('http://examplestore.vtexcommercestable.com.br')
+const appDirectory = fs.realpathSync(process.cwd())
+const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath)
+const templatePrefix = pjson.storeName.replace(/\s/, '').toUpperCase() + '-'
+
+const templatesDir = resolveApp('build/templates')
+const subtemplatesDir = resolveApp('build/subtemplates')
+const shelvesDir = resolveApp('build/prateleiras')
+const filesDir = resolveApp('build/arquivos')
+
+fs.readdirSync(subtemplatesDir)
+  .forEach(file => {
+    const content = fs.readFileSync(`${subtemplatesDir}/${file}`, 'utf8')
+    cms.saveTemplate(templatePrefix + file.replace('.html', ''), content, true)
+      .then(console.log)
+      .catch(console.error)
+  })
+
+fs.readdirSync(shelvesDir)
+  .forEach(file => {
+    const content = fs.readFileSync(`${shelvesDir}/${file}`, 'utf8')
+    cms.saveShelfTemplate(templatePrefix + file.replace('.html', ''), content)
+      .then(console.log)
+      .catch(console.error)
+  });
+
+fs.readdirSync(templatesDir)
+  .forEach(file => {
+    const content = fs.readFileSync(`${templatesDir}/${file}`, 'utf8')
+    cms.saveTemplate(templatePrefix + file.replace('.html', '').replace('index', 'Home'), content)
+      .then(console.log)
+      .catch(console.error)
+  })
+
+fs.readdirSync(filesDir)
+  .forEach(file => cms.saveFile(`${filesDir}/${file}`)
+                      .then(console.log)
+                      .catch(console.error))
+```
+
 ## License
 MIT © [Mauricio Alvim](https://github.com/alvimm)
