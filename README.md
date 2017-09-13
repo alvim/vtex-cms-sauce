@@ -11,7 +11,7 @@ VTEX package for handling CMS requests
 1. `npm install vtex-cms-sauce`.
 
 2. Create a `.vtexid` config file in project root with the following content:
-```
+```json
 {
   "login": "your-email@something.com",
   "password": "your-password"
@@ -20,7 +20,7 @@ VTEX package for handling CMS requests
 *NOTE: You must have access to the store you're trying to work on. Also, you should use your VTEX login and password, not Google/Facebook.*
 
 3. Create your api-sauced cms handler:
-```
+```javascript
 import { create } from 'vtex-cms-sauce'
 const cms = create('https://STORE_NAME.vtexcommercestable.com.br')
 ...
@@ -35,7 +35,7 @@ const cms = create('https://STORE_NAME.vtexcommercestable.com.br')
 * isSub **{Boolean}** - *Pass true if subtemplate*
 
 ###### Example
-```
+```javascript
 const HTML = `<!DOCTYPE html>
 <head>
   <title>VTEX</title>
@@ -57,7 +57,7 @@ cms
 * shelfClass **{String}** - *Classname of shelf container*
 
 ###### Example
-```
+```javascript
 const HTML = `
 <div class="product">
   Product
@@ -74,7 +74,7 @@ cms
 * filepath **{String}** - *Path of file to be uploaded*
 
 ###### Example
-```
+```javascript
 cms
   .saveFile('/dist/background.png')
   .then(console.log)
@@ -82,7 +82,7 @@ cms
 ```
 
 ### Publish script example
-```
+```javascript
 const path = require('path'),
     fs = require('fs'),
     create = require('vtex-cms-sauce').create,
