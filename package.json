@@ -25,11 +25,11 @@
   "dependencies": {
     "apisauce": "^0.13.0",
     "cheerio": "^1.0.0-rc.2",
-    "form-data": "^2.1.4"
+    "form-data": "^2.1.4",
+    "babel-core": "^6.24.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "babel-core": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.5.1"
