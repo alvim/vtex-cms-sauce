@@ -1,3 +1,7 @@
+:warning::warning::warning: This package is temporary broken! :warning::warning::warning:
+*VTEX 2FA is blocking any vtex-cms-sauce request. An update will be available soon to fix this.*
+
+
 VTEX-CMS-Sauce
 ==============
 VTEX package for handling CMS requests
