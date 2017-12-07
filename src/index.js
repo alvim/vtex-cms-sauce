@@ -47,10 +47,12 @@ const create = (baseURL) => {
     request.data = str.join('&')
   })
 
-  const _getAuthCookie = async () => {
+  let _getAuthCookie = async () => {
     try {
-      const val = await ask('Insert authentication token:')
-      return val
+      const authCookie = await ask('Insert authentication cookie:')
+
+      _getAuthCookie = () => authCookie
+      return authCookie
     } catch(err) { console.error(err) }
   }
 
