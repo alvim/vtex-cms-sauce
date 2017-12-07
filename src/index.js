@@ -1,11 +1,28 @@
 import 'babel-core/register'
 import 'babel-polyfill'
+import rl from 'readline'
 import { readFileSync, createReadStream } from 'fs'
 import { createHash } from 'crypto'
 import FormData from 'form-data'
 import cheerio from 'cheerio'
 
 import apisauce from 'apisauce'
+
+const ask = (question) => {
+  const r = rl.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+
+  return new Promise((resolve, reject) => {
+    r.question(question + '\n', function(answer) {
+      r.close()
+
+      if (answer) resolve(answer)
+      else { reject('No answer!') }
+    })
+  })
+}
 
 const VTEXID = JSON.parse(readFileSync('.vtexid', 'utf8'))
 
@@ -32,18 +49,8 @@ const create = (baseURL) => {
 
   const _getAuthCookie = async () => {
     try {
-      const { data: { authenticationToken } } = await api.get('api/vtexid/pub/authentication/start')
-      if (!authenticationToken) throw new Error('Can\'t get an authentication token.')
-
-      api.setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
-      const params = {
-        authenticationToken,
-        ...VTEXID
-      }
-      const { data: { authCookie: { Value } } } = await api.get('api/vtexid/pub/authentication/classic/validate', params)
-      if (!Value) throw new Error('Can\'t get an authentication cookie.')
-
-      return Value
+      const val = await ask('Insert authentication token:')
+      return val
     } catch(err) { console.error(err) }
   }
 
@@ -176,7 +183,7 @@ const create = (baseURL) => {
   return {
     saveTemplate,
     saveShelfTemplate,
-    saveFile,
+    saveFile
   }
 }
 
