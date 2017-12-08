@@ -1,137 +1,95 @@
-## :warning::warning::warning: This package is temporary broken! :warning::warning::warning:
+# VTEX Template
 
-*VTEX 2FA is blocking any vtex-cms-sauce request. An update will be available soon to fix this.*
+Boilerplate de projeto Rex para VTEX.
 
+## Iniciando um novo projeto
 
-VTEX-CMS-Sauce
-==============
-VTEX package for handling CMS requests
---------------------------------------
-*This package is not official and may be deprecated as a result of any future changes to the VTEX portal. Before that, use it freely and wisely.*
+Requisitos:
 
-## :warning: Warning! :warning:
-*VTEX-CMS-Sauce was created to allow a better deploying experience for VTEX shops. Therefore, it's recommended to use it in a brand new environment, to minimize the risk of overwriting existing templates. The chances are almost null, but I thought I should warn you.*
+* Node.js
+* NPM
 
-### Getting started
-1. `npm install vtex-cms-sauce`.
+## Instruções
 
-
-2. Create your api-sauced cms handler:
-```javascript
-import { create } from 'vtex-cms-sauce'
-const cms = create('https://STORE_NAME.vtexcommercestable.com.br')
-...
+#### 1. Faça um novo fork deste repositório.
+No novo projeto, adicione `vtex-template` como um remote de nome "upstream":
+```
+git remote add upstream git@bitbucket.org:OriginalTechExperiences/vtex-template.git
 ```
 
-3. Insert your VTEX ID authentication cookie when prompted.
-*NOTE: You must have access to the store you're trying to work on. Also, you should use your VTEX login and password, not Google/Facebook.*
-
-### Methods
-
-#### Save Template
-`cms.saveTemplate(templateName, HTML, isSub = false)`
-* templateName **{String}** - *From this string, the templateId will be created in background.*
-* HTML **{String}** - *String containing the HTML template.*
-* isSub **{Boolean}** - *Pass true if subtemplate*
-
-###### Example
-```javascript
-const HTML = `<!DOCTYPE html>
-<head>
-  <title>VTEX</title>
-</head>
-<body>
-  <h1>Hello, World!</h1>
-</body>
-`
-cms
-  .saveTemplate('Home', HTML)
-  .then(console.log)
-  .catch(console.error)
+#### 2. Inicie o Git Flow
+Execute o comando `git flow init` e aceite as sugestões de nomenclatura de branches padrão.
+A partir de agora, seu projeto tem o seguinte modelo de branches:
+```
+branches de releases
+      __||__
+     |     |
+     |     |        branches de feature----------------
+     |     |       /
+     |     develop-------------------------------------
+     |    /
+     master--------------------------------------------
+    /
+upstream (vtex-template)-------------------------------
 ```
 
-#### Save Shelf Template
-`cms.saveShelfTemplate(templateName, HTML, shelfClass)`
-* templateName **{String}** - *From this string, the templateId will be created in background.*
-* HTML **{String}** - *String containing the HTML template.*
-* shelfClass **{String}** - *Classname of shelf container*
+#### 3. `npm install`
 
-###### Example
-```javascript
-const HTML = `
-<div class="product">
-  Product
-</div>
-`
-cms
-  .saveShelfTemplate('MainShelf', HTML, 'main-shelf')
-  .then(console.log)
-  .catch(console.error)
+#### 4. Substitua as variáveis no arquivo `config/variables.js`
+
+#### 5. Scripts
+##### Start
+Para desenvolvimento local, execute: `npm run start`.
+##### Build
+Para gerar os arquivos finais, execute: `npm run build`.
+##### Deploy
+Antes de publicar um template, crie um arquivo `.vtexid` na raíz do projeto com o conteúdo:
+```json
+{
+  "login": "seuemail@originalgtx.io",
+  "password": "suasenha"
+}
 ```
 
-#### Save File
-`cms.saveFile(filepath)`
-* filepath **{String}** - *Path of file to be uploaded*
-
-###### Example
-```javascript
-cms
-  .saveFile('/dist/background.png')
-  .then(console.log)
-  .catch(console.error)
+Para publicar o template diretamente no portal da VTEX, rode o comando: 
+```
+npm run deploy
 ```
 
-### Publish script example
-```javascript
-const path = require('path'),
-    fs = require('fs'),
-    create = require('vtex-cms-sauce').create,
-    pjson = require('../package.json'),
-    projectVars = require('../config/variables')
+### Rebase
+Sempre que o Upstream (vtex-template) for atualizado, seu projeto pode executar:
 
-const cms = create(`https://${projectVars.STORE_ID}.vtexcommercestable.com.br`)
-const appDirectory = fs.realpathSync(process.cwd())
-const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath)
-const templatePrefix = projectVars.TEMPLATE_PREFIX
-
-const templatesDir = resolveApp('dist/templates')
-const subtemplatesDir = resolveApp('dist/subtemplates')
-const shelvesDir = resolveApp('dist/shelves')
-const filesDir = resolveApp('dist/arquivos')
-
-const getFiles = dir => fs.readdirSync(dir).filter(str => str[0] !== '_')
-
-const sendFiles = (dir, type = 'template') => new Promise(async (resolve, reject) => {
-  try {
-    let logs = ''
-    const files = fs.readdirSync(dir).filter(str => str[0] !== '_')
-
-    for (let i = 0; i < files.length; i++) {
-      let log
-      let file = files[i]
-      let content = fs.readFileSync(`${dir}/${file}`, 'utf8')
-
-      if (type === 'template') log = await cms.saveTemplate(templatePrefix + file.replace('.html', '').replace('index', 'Home'), content)
-      else if (type === 'subtemplate') log = await cms.saveTemplate(templatePrefix + file.replace('.html', ''), content, true)
-      else if (type === 'shelf') log = await cms.saveShelfTemplate(templatePrefix + file.replace('.html', ''), content, 'prateleira')
-      else if (type === 'file') log = await cms.saveFile(`${dir}/${file}`)
-
-      logs += `${log}\n`
-    }
-
-    console.log(logs)
-    resolve(sendFiles)
-  } catch(err) {
-    console.error('Error while sending files.')
-    reject(sendFiles)
-  }
-})
-
-sendFiles(templatesDir, 'template')
-  .then(() => sendFiles(subtemplatesDir, 'subtemplate'))
-  .then(() => sendFiles(shelvesDir, 'shelf'))
-  .then(() => sendFiles(filesDir, 'file'))
+```
+git fetch upstream
+git rebase upstream/master
 ```
 
-## License
-MIT © [Mauricio Alvim](https://github.com/alvimm)
+### Pug
+
+##### Novas rotas
+Todo arquivo `.pug` criado sob o diretório `src/pug/templates` cria uma nova rota html de mesmo nome.
+Por exemplo: `src/pug/templates/produto.pug` criará a rota `localhost:8080/produto.html`.
+
+*¹ Pra cada rota nova criada, o ambiente deve ser reiniciado, caso já esteja sendo exeutado.*
+
+*² Modificações nos arquivos Pug não estão sujeitas a _Hot Module Replacement_. Deve-se forçar o refresh da página a cada modificação dos arquivos.*
+
+### Trabalhando com imagens
+Toda imagem utilizada no projeto deve ser armazenada na pasta `src/arquivos`. Só serão compiladas para o build final as imagens que forem efetivamente usadas.
+Dessa forma, caso uma imagem seja salva na pasta `src/arquivos`, mas não sofra `require` ou `import` ao longo do template, ela não será compilada no build.
+Todas as imagens utilizadas serão otimizadas pelo `imagemin-webpack-plugin`.
+
+#### Inserindo imagens no Pug
+```pug
+.cart
+	img(src=require('../../arquivos/icon.png'))
+```
+
+### Adicionando polyfills
+Polyfills devem ser adicionados no arquivo `config/polyfills.js`, pois ele é importado antes de todo o código do projeto.
+
+### Deploy
+Todos os arquivos em `src/pug/templates`, `src/pug/subtemplates` e `src/pug/shelves`, serão compilados para pastas de mesmo nome. Após compilados, quando submetidos ao deploy, cada html será salvo na loja como seu respectivo tipo (ex.: shelf, subtemplate ou template).
+Se for necessário criar novos arquivos que sejam reaproveitados pelo projeto, mas que não devem ser publicados por si só, deve-se criar uma nova pasta para isso. Por exemplo: `src/pug/components`.
+
+### Troubleshooting
