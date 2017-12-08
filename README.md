@@ -112,7 +112,7 @@ fs.readdirSync(shelvesDir)
     cms.saveShelfTemplate(templatePrefix + file.replace('.html', ''), content)
       .then(console.log)
       .catch(console.error)
-  });
+  })
 
 fs.readdirSync(templatesDir)
   .forEach(file => {

@@ -1,7 +1,7 @@
 import 'babel-core/register'
 import 'babel-polyfill'
 import rl from 'readline'
-import { readFileSync, createReadStream } from 'fs'
+import { createReadStream } from 'fs'
 import { createHash } from 'crypto'
 import FormData from 'form-data'
 import cheerio from 'cheerio'
@@ -23,8 +23,6 @@ const ask = (question) => {
     })
   })
 }
-
-const VTEXID = JSON.parse(readFileSync('.vtexid', 'utf8'))
 
 const create = (baseURL) => {
   // Create and configure an apisauce-based api object.
