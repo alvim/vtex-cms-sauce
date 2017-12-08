@@ -1,6 +1,6 @@
 {
   "name": "vtex-cms-sauce",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "VTEX plugin for handling cms requests.",
   "main": "lib/index.js",
   "scripts": {
