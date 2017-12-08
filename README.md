@@ -19,7 +19,7 @@ const cms = create('https://STORE_NAME.vtexcommercestable.com.br')
 ```
 
 3. Insert your VTEX ID authentication cookie when prompted.
-*NOTE: You must have access to the store you're trying to work on. Also, you should use your VTEX login and password, not Google/Facebook.*
+*NOTE: You must have access to the store you're trying to work on.*
 
 ### Methods
 
