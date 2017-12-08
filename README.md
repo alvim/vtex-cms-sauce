@@ -15,21 +15,16 @@ VTEX package for handling CMS requests
 ### Getting started
 1. `npm install vtex-cms-sauce`.
 
-2. Create a `.vtexid` config file in project root with the following content:
-```json
-{
-  "login": "your-email@something.com",
-  "password": "your-password"
-}
-```
-*NOTE: You must have access to the store you're trying to work on. Also, you should use your VTEX login and password, not Google/Facebook.*
 
-3. Create your api-sauced cms handler:
+2. Create your api-sauced cms handler:
 ```javascript
 import { create } from 'vtex-cms-sauce'
 const cms = create('https://STORE_NAME.vtexcommercestable.com.br')
 ...
 ```
+
+3. Insert your VTEX ID authentication cookie when prompted.
+*NOTE: You must have access to the store you're trying to work on. Also, you should use your VTEX login and password, not Google/Facebook.*
 
 ### Methods
 
