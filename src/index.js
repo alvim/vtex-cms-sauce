@@ -99,6 +99,34 @@ const create = (baseURL) => {
     return `Couldn't save template (${templatename}): ${obj.message}`
   }
 
+  const _getTemplates = async (type = 'viewTemplate', isSub = true) => {
+    const endpoint = `admin/a/PortalManagement/GetTemplateList?type=${type}&IsSub=${isSub ? 0 : 1}`
+    const authCookie = await _getAuthCookie()
+
+    api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
+    api.setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
+
+    return api.post(endpoint)
+  }
+
+  const _saveLegacyTemplate = async (reqData, isSub) => {
+    const { data: templatesList } = await _getTemplates('viewTemplate', isSub)
+    // console.log(template)
+    const regex = /(>(.+)(?=<\/div>))|(templateId=(.+)(?=" onclick))/g
+    const matches = templatesList.match(regex)
+
+    const obj = {}
+
+    for (let i = 0; i < matches.length; i += 2) {
+      let prop = 
+        obj[matches[i].replace('>', '')] = matches[i + 1].replace('templateId=', '')
+    }
+
+    console.log(obj)
+
+    const { status, data } = await _saveTemplate(reqData, isSub)
+  }
+
   const saveShelfTemplate = async (templateName, HTML, shelfClass) => {
     try {
       const reqData = {
@@ -139,6 +167,7 @@ const create = (baseURL) => {
       const { status, data } = await _saveTemplate(reqData, isSub)
 
       if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${templatename}). Status: ${status}`)
+      else if (~data.indexOf('already exists')) return _saveLegacyTemplate(reqData, isSub)
       else if (~data.indexOf('originalMessage')) throw new Error(_parseErrorMessage(data, templatename))
 
       return `Template (${templatename}) saved!`
