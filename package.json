@@ -4,7 +4,8 @@
   "description": "VTEX plugin for handling cms requests.",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel src -d lib"
+    "build": "babel src -d lib",
+    "watch": "watch 'npm run build' src"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
     "babel-cli": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-polyfill": "^6.23.0",
-    "babel-preset-env": "^1.5.1"
+    "babel-preset-env": "^1.5.1",
+    "watch": "^1.0.2"
   }
 }

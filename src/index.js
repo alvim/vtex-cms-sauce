@@ -99,8 +99,9 @@ const create = (baseURL) => {
     return `Couldn't save template (${templatename}): ${obj.message}`
   }
 
-  const _getTemplates = async (type = 'viewTemplate', isSub = true) => {
-    const endpoint = `admin/a/PortalManagement/GetTemplateList?type=${type}&IsSub=${isSub ? 0 : 1}`
+  const _getTemplates = async (type, isSub = false) => {
+    (type, isSub)
+    const endpoint = `admin/a/PortalManagement/GetTemplateList?type=${type}&IsSub=${isSub ? 1 : 0}`
     const authCookie = await _getAuthCookie()
 
     api.setHeader('Cookie', `VtexIdclientAutCookie=${authCookie};`)
@@ -109,22 +110,30 @@ const create = (baseURL) => {
     return api.post(endpoint)
   }
 
-  const _saveLegacyTemplate = async (reqData, isSub) => {
-    const { data: templatesList } = await _getTemplates('viewTemplate', isSub)
-    // console.log(template)
-    const regex = /(>(.+)(?=<\/div>))|(templateId=(.+)(?=" onclick))/g
-    const matches = templatesList.match(regex)
+  const _getLegacyTemplateId = async (reqData, type, isSub = false) => {
+    try {
+      const { data: templatesList } = await _getTemplates(type, isSub)
 
-    const obj = {}
+      const name = reqData.templateName || reqData.templatename
+      const regex = new RegExp(`(${name})([\\s\\S]+?)(templateId=)([\\s\\S]+?(?="))`)
+      const templateId = templatesList.match(regex)[4]
+      if (!templateId) throw new Error('template not found!')
 
-    for (let i = 0; i < matches.length; i += 2) {
-      let prop = 
-        obj[matches[i].replace('>', '')] = matches[i + 1].replace('templateId=', '')
-    }
+      return templateId
+    } catch(err) { console.error(`Couldn't get legacy template id: ${err}`) }
+  }
 
-    console.log(obj)
+  const _saveLegacyTemplate = async (reqData, type = 'viewTemplate', isSub) => {
+    try {
+      const name = reqData.templateName || reqData.templatename
+      reqData.templateId = await _getLegacyTemplateId(reqData, type, isSub)
+      const { status, data } = await _saveTemplate(reqData, isSub)
 
-    const { status, data } = await _saveTemplate(reqData, isSub)
+      if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${name}). Status: ${status}`)
+      else if (~data.indexOf('originalMessage')) throw new Error(_parseErrorMessage(data, name))
+
+      return `Template (${name}) saved!`
+    } catch(err) { console.error(err) }
   }
 
   const saveShelfTemplate = async (templateName, HTML, shelfClass) => {
@@ -134,7 +143,7 @@ const create = (baseURL) => {
         templateId: _getTemplateId(templateName),
         template: HTML,
         roundCorners: false,
-        templateCssClass: shelfClass
+        templateCssClass: shelfClass,
       }
       let { status, data } = await _saveTemplate(reqData, true, 'shelf')
       let term = 'saved'
@@ -164,10 +173,10 @@ const create = (baseURL) => {
         templateId: _getTemplateId(templatename),
         template: HTML
       }
-      const { status, data } = await _saveTemplate(reqData, isSub)
+      let { status, data } = await _saveTemplate(reqData, isSub)
+      if (~data.indexOf('already exists')) await _saveLegacyTemplate(reqData, 'viewTemplate', isSub)
 
-      if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${templatename}). Status: ${status}`)
-      else if (~data.indexOf('already exists')) return _saveLegacyTemplate(reqData, isSub)
+      else if (status.toString().substr(0, 1) !== '2') throw new Error(`Couldn't save template (${templatename}). Status: ${status}`)
       else if (~data.indexOf('originalMessage')) throw new Error(_parseErrorMessage(data, templatename))
 
       return `Template (${templatename}) saved!`
@@ -210,6 +219,7 @@ const create = (baseURL) => {
 
   // The public API
   return {
+    _getTemplates,
     saveTemplate,
     saveShelfTemplate,
     saveFile
