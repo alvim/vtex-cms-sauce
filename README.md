@@ -1,11 +1,6 @@
 VTEX-CMS-Sauce
 ==============
-VTEX package for handling CMS requests
---------------------------------------
-*This package is not official and may be deprecated as a result of any future changes to the VTEX portal. Before that, use it freely and wisely.*
-
-## :warning: Warning! :warning:
-*VTEX-CMS-Sauce was created to allow a better deploying experience for VTEX shops. Therefore, it's recommended to use it in a brand new environment, to minimize the risk of overwriting existing templates. The chances are almost null, but I thought I should warn you.*
+VTEX CMS Sauce was created to allow a better deploying experience to VTEX stores. You can use it to upload several templates and files in some seconds, as an alternative to the old VTEX portal.
 
 ### Getting started
 1. `npm install vtex-cms-sauce`.
