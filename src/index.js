@@ -1,5 +1,5 @@
-import 'babel-core/register'
-import 'babel-polyfill'
+import '@babel/register'
+import '@babel/polyfill'
 import rl from 'readline'
 import { createReadStream } from 'fs'
 import { createHash } from 'crypto'
